@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Laddu Ledger</title>
+<style>
+:root{--bg:#f5f6fb;--card:#fff;--text:#1b1f3b;--muted:#6b7090;--line:#e6e8f2;--accent:#6c4cf1;--accent2:#ff7a59;--ok:#12a36b;--danger:#e5484d;--shadow:0 8px 30px rgba(40,40,100,.08);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1120;--card:#181b30;--text:#eceefc;--muted:#9a9fc4;--line:#262a47;--shadow:0 8px 30px rgba(0,0,0,.4);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1120;--card:#181b30;--text:#eceefc;--muted:#9a9fc4;--line:#262a47;--shadow:0 8px 30px rgba(0,0,0,.4);color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:24px 16px 60px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}
+h1{margin:0;font-size:26px;letter-spacing:-.5px}
+h1 span{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--muted);font-size:14px;margin-top:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:20px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:18px}
+.stat{padding:18px;border-radius:18px;color:#fff;box-shadow:var(--shadow)}
+.stat small{opacity:.85;font-size:12px;text-transform:uppercase;letter-spacing:.8px}
+.stat b{display:block;font-size:26px;margin-top:6px}
+.s1{background:linear-gradient(135deg,#6c4cf1,#8f7bff)}.s2{background:linear-gradient(135deg,#ff7a59,#ffa26b)}.s3{background:linear-gradient(135deg,#12a36b,#41d39a)}.s4{background:linear-gradient(135deg,#2b6fff,#5fb0ff)}
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;align-items:end}
+label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px;font-weight:600}
+label i{font-weight:400;font-style:normal}
+input{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:15px;outline:none}
+input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,76,241,.18)}
+button{cursor:pointer;border:0;border-radius:12px;padding:11px 16px;font-size:15px;font-weight:600}
+.btn{background:linear-gradient(90deg,var(--accent),#8f6bff);color:#fff}
+.btn:hover{filter:brightness(1.08)}
+.ghost{background:var(--bg);color:var(--text);border:1px solid var(--line)}
+.dangerbtn{background:var(--danger);color:#fff}
+.preview{font-size:13px;color:var(--muted);margin-top:10px}
+.preview b{color:var(--ok)}
+.bar{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;margin:22px 0 12px}
+.bar h2{margin:0;font-size:18px}
+.bar input{max-width:260px}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th,td{padding:12px 10px;text-align:left;border-bottom:1px solid var(--line);font-size:14px;white-space:nowrap}
+th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.6px}
+td.num,th.num{text-align:right}
+tbody tr:hover{background:rgba(108,76,241,.06)}
+.tag{display:inline-block;background:rgba(255,122,89,.15);color:var(--accent2);padding:3px 10px;border-radius:99px;font-weight:600}
+.pend{color:var(--muted);font-style:italic}
+tfoot td{font-weight:700;font-size:15px;border-bottom:0;border-top:2px solid var(--line)}
+.act{display:flex;gap:6px;justify-content:flex-end}
+.act button{background:transparent;border:1px solid var(--line);padding:6px 12px;font-size:13px}
+.edit{color:var(--accent)}.del{color:var(--danger)}
+.empty{text-align:center;color:var(--muted);padding:30px 0}
+.modal{position:fixed;inset:0;background:rgba(10,12,30,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal.on{display:flex}
+.box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;width:100%;max-width:420px;box-shadow:var(--shadow)}
+.box h3{margin:0 0 14px}
+.box .grid{display:grid;gap:12px}
+.btns{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+.err{color:var(--danger);font-size:13px;margin-top:8px;min-height:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div><h1><span>Laddu</span> Ledger</h1><div class="sub">Customer records, weights and billing in one place</div></div>
+  <button class="ghost" id="theme" type="button">Theme</button>
+</header>
+
+<div class="stats">
+  <div class="stat s1"><small>Customers</small><b id="stC">0</b></div>
+  <div class="stat s2"><small>Total Weight</small><b id="stK">0 kg</b></div>
+  <div class="stat s3"><small>Overall Amount</small><b id="stA">₹0</b></div>
+  <div class="stat s4"><small>Rate Pending</small><b id="stP">0</b></div>
+</div>
+
+<div class="card">
+  <form id="f" autocomplete="off">
+    <div><label>Name</label><input id="name" placeholder="Customer name" required></div>
+    <div><label>Phone No</label><input id="phone" type="tel" inputmode="tel" placeholder="98765 43210" required></div>
+    <div><label>Sweet</label><input value="Laddu" disabled></div>
+    <div><label>Weight (kg)</label><input id="kg" type="number" step="any" min="0" placeholder="0.00" required></div>
+    <div><label>Rate (₹ per kg) <i>optional</i></label><input id="rate" type="number" step="any" min="0" placeholder="Leave empty if not sure"></div>
+    <div><button class="btn" type="submit" style="width:100%">+ Add Customer</button></div>
+  </form>
+  <div class="preview" id="pv">Total for this entry: <b>₹0</b></div>
+  <div class="err" id="err"></div>
+</div>
+
+<div class="bar">
+  <h2>All Records</h2>
+  <input id="q" placeholder="Search name or phone…">
+</div>
+
+<div class="card scroll" style="padding:8px 14px">
+<table>
+  <thead><tr><th>S/N</th><th>Name</th><th>Phone No</th><th>Sweet</th><th class="num">Kg</th><th class="num">Rate / kg</th><th class="num">Total</th><th></th></tr></thead>
+  <tbody id="tb"></tbody>
+  <tfoot id="tf"></tfoot>
+</table>
+</div>
+</div>
+
+<div class="modal" id="mEdit"><div class="box">
+  <h3>Edit Customer</h3>
+  <div class="grid">
+    <div><label>Name</label><input id="eName"></div>
+    <div><label>Phone No</label><input id="ePhone" type="tel" inputmode="tel"></div>
+    <div><label>Weight (kg)</label><input id="eKg" type="number" step="any" min="0"></div>
+    <div><label>Rate (₹ per kg) <i>optional</i></label><input id="eRate" type="number" step="any" min="0" placeholder="Leave empty if not sure"></div>
+  </div>
+  <div class="preview" id="ePv"></div>
+  <div class="btns"><button class="ghost" id="eCancel" type="button">Cancel</button><button class="btn" id="eSave" type="button">Save Changes</button></div>
+</div></div>
+
+<div class="modal" id="mDel"><div class="box">
+  <h3>Delete this record?</h3>
+  <div id="dTxt" class="sub"></div>
+  <div class="btns"><button class="ghost" id="dCancel" type="button">Cancel</button><button class="dangerbtn" id="dOk" type="button">Delete</button></div>
+</div></div>
+
+<script>
+var KEY="sweet-ledger-v1", rows=[], editId=null, delId=null;
+var $=function(i){return document.getElementById(i)};
+var money=function(n){return "₹"+Number(n||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})};
+var kgf=function(n){return Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:3})};
+var hasRate=function(r){return r.rate!==null&&r.rate!==undefined&&r.rate!==""&&!isNaN(r.rate)};
+function load(){try{var r=localStorage.getItem(KEY);rows=r?JSON.parse(r):[]}catch(e){rows=[]}if(!Array.isArray(rows))rows=[]}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(rows));$("err").textContent=""}catch(e){$("err").textContent="Could not save in this browser."}}
+function esc(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML}
+function parseRate(v){v=String(v).trim();if(v==="")return null;var n=parseFloat(v);return isNaN(n)?null:n}
+function render(){
+  var q=$("q").value.trim().toLowerCase();
+  var list=rows.map(function(r,i){return {r:r,n:i+1}}).filter(function(o){
+    return !q||(o.r.name+" "+o.r.phone).toLowerCase().indexOf(q)>-1});
+  var tb=$("tb");
+  if(!list.length){tb.innerHTML='<tr><td colspan="8" class="empty">'+(rows.length?"No matching records.":"No customers yet. Add your first one above.")+'</td></tr>'}
+  else tb.innerHTML=list.map(function(o){var r=o.r;
+    var rate=hasRate(r)?money(r.rate):'<span class="pend">Not set</span>';
+    var tot=hasRate(r)?'<b>'+money(r.kg*r.rate)+'</b>':'<span class="pend">—</span>';
+    return '<tr><td>'+o.n+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.phone)+'</td><td><span class="tag">Laddu</span></td><td class="num">'+kgf(r.kg)+'</td><td class="num">'+rate+'</td><td class="num">'+tot+'</td><td><div class="act"><button class="edit" data-edit="'+r.id+'" type="button">Edit</button><button class="del" data-del="'+r.id+'" type="button">Delete</button></div></td></tr>'}).join("");
+  var tk=0,ta=0,pk=0,pend=0;
+  rows.forEach(function(r){tk+=r.kg;if(hasRate(r)){ta+=r.kg*r.rate;pk+=r.kg}else pend++});
+  $("tf").innerHTML='<tr><td colspan="4">Overall ('+rows.length+' customers)</td><td class="num">'+kgf(tk)+' kg</td><td class="num">'+(pk?money(ta/pk)+' avg':'—')+'</td><td class="num">'+money(ta)+'</td><td></td></tr>';
+  $("stC").textContent=rows.length;$("stK").textContent=kgf(tk)+" kg";$("stA").textContent=money(ta);$("stP").textContent=pend;
+}
+function pvText(kg,rate){var k=parseFloat(kg)||0,r=parseRate(rate);return r===null?"Total for this entry: <b>Rate not set</b>":"Total for this entry: <b>"+money(k*r)+"</b>"}
+function prev(){$("pv").innerHTML=pvText($("kg").value,$("rate").value)}
+$("kg").oninput=prev;$("rate").oninput=prev;$("q").oninput=render;prev();
+$("f").onsubmit=function(e){
+  e.preventDefault();
+  var kg=parseFloat($("kg").value);
+  if(isNaN(kg))return;
+  rows.push({id:Date.now()+"-"+Math.random().toString(36).slice(2,6),name:$("name").value.trim(),phone:$("phone").value.trim(),sweet:"Laddu",kg:kg,rate:parseRate($("rate").value)});
+  save();render();$("f").reset();prev();$("name").focus();
+};
+function find(id){for(var i=0;i<rows.length;i++)if(rows[i].id===id)return rows[i];return null}
+function ePrev(){$("ePv").innerHTML=pvText($("eKg").value,$("eRate").value)}
+$("eKg").oninput=ePrev;$("eRate").oninput=ePrev;
+$("tb").onclick=function(e){
+  var t=e.target;
+  var eid=t.getAttribute("data-edit"),did=t.getAttribute("data-del");
+  if(eid){var r=find(eid);if(!r)return;editId=eid;
+    $("eName").value=r.name;$("ePhone").value=r.phone;$("eKg").value=r.kg;$("eRate").value=hasRate(r)?r.rate:"";ePrev();$("mEdit").classList.add("on")}
+  if(did){var d=find(did);if(!d)return;delId=did;
+    $("dTxt").textContent=d.name+" ("+kgf(d.kg)+" kg) will be removed permanently.";$("mDel").classList.add("on")}
+};
+$("eCancel").onclick=function(){$("mEdit").classList.remove("on");editId=null};
+$("eSave").onclick=function(){
+  var r=find(editId);if(!r)return;
+  var kg=parseFloat($("eKg").value);
+  if(!$("eName").value.trim()||isNaN(kg)){return}
+  r.name=$("eName").value.trim();r.phone=$("ePhone").value.trim();r.kg=kg;r.rate=parseRate($("eRate").value);
+  save();render();$("mEdit").classList.remove("on");editId=null;
+};
+$("dCancel").onclick=function(){$("mDel").classList.remove("on");delId=null};
+$("dOk").onclick=function(){
+  rows=rows.filter(function(r){return r.id!==delId});
+  save();render();$("mDel").classList.remove("on");delId=null;
+};
+$("theme").onclick=function(){
+  var d=document.documentElement,dark=d.getAttribute("data-theme")==="dark"||(!d.getAttribute("data-theme")&&matchMedia("(prefers-color-scheme: dark)").matches);
+  d.setAttribute("data-theme",dark?"light":"dark");
+};
+load();render();
+</script>
+</body>
+</html>
